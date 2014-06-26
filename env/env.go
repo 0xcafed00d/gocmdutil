@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// lists envionment vars
 func main() {
 	var match string
 
