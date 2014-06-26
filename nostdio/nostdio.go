@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"neomech/lib/neo"
+	"github.com/simulatedsimian/neo"
 	"os"
 	"os/exec"
 )
