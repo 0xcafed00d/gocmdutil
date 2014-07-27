@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/nsf/termbox-go"
 	//	"github.com/simulatedsimian/neo"
+	"github.com/davecgh/go-spew/spew"
 	"os"
 	"path/filepath"
 	"unicode/utf8"
@@ -22,17 +23,41 @@ func printAtDef(x, y int, s string) {
 	printAt(x, y, s, termbox.ColorDefault, termbox.ColorDefault)
 }
 
-func WalkFunc(path string, info os.FileInfo, err error) error {
-	if info.IsDir() && path != "." {
-		fmt.Println("+", path)
-		return filepath.SkipDir
+type treeNode struct {
+	info     os.FileInfo
+	children []treeNode
+}
+
+func createNodes(path string) ([]treeNode, error) {
+	var res []treeNode
+
+	walkFunc := func(path string, info os.FileInfo, err error) error {
+		if err == nil {
+			if info.IsDir() && path != "." {
+				return filepath.SkipDir
+			} else {
+				res = append(res, treeNode{info, nil})			
+			}
+		}
+		return nil
 	}
-	fmt.Println(path)
-	return nil
+
+	err := filepath.Walk(path, walkFunc)
+
+	if err == nil {
+		return res, nil
+	} else {
+		return nil, err
+	}
 }
 
 func test() {
-	filepath.Walk(".", WalkFunc)
+	
+	nodes, err := createNodes (".")
+	
+	spew.Dump(&nodes)
+	fmt.Println(err)
+
 }
 
 func termtest() {
