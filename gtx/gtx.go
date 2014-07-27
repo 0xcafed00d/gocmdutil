@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/nsf/termbox-go"
-	//	"github.com/simulatedsimian/neo"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/nsf/termbox-go"
+	"github.com/simulatedsimian/neo"
 	"os"
 	"path/filepath"
 	"unicode/utf8"
@@ -25,39 +25,56 @@ func printAtDef(x, y int, s string) {
 
 type treeNode struct {
 	info     os.FileInfo
-	children []treeNode
+	children []*treeNode
+	parent   *treeNode
 }
 
-func createNodes(path string) ([]treeNode, error) {
-	var res []treeNode
+func createNodes(path string, parent *treeNode) ([]*treeNode, error) {
+	var res []*treeNode
 
-	walkFunc := func(path string, info os.FileInfo, err error) error {
-		if err == nil {
-			if info.IsDir() && path != "." {
+	fmt.Println(path)
+
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err == nil && path != "." {
+			res = append(res, &treeNode{info, nil, parent})
+			if info.IsDir() {
 				return filepath.SkipDir
-			} else {
-				res = append(res, treeNode{info, nil})			
 			}
 		}
 		return nil
-	}
+	})
 
-	err := filepath.Walk(path, walkFunc)
+	return res, err
+}
 
-	if err == nil {
-		return res, nil
-	} else {
-		return nil, err
+func populateChildren(node *treeNode) error {
+
+	if node.info.IsDir() {
+		children, err := createNodes(getPathFromNode(node), node)
+		neo.PanicOnError(err)
+		node.children = children
 	}
+	return nil
+}
+
+func getPathFromNode(node *treeNode) string {
+	path := node.info.Name()
+	for node.parent != nil {
+		path = filepath.Join(node.info.Name(), path)
+	}
+	return path
 }
 
 func test() {
-	
-	nodes, err := createNodes (".")
-	
-	spew.Dump(&nodes)
-	fmt.Println(err)
+	nodes, err := createNodes(".", nil)
+	neo.PanicOnError(err)
 
+	for _, node := range nodes {
+		populateChildren(node)
+	}
+
+	spew.Dump(nodes)
+	fmt.Println(err)
 }
 
 func termtest() {
@@ -92,7 +109,6 @@ func termtest() {
 	}
 
 	termbox.Flush()
-
 }
 
 func main() {
