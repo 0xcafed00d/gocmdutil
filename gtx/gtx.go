@@ -27,16 +27,16 @@ type treeNode struct {
 	info     os.FileInfo
 	children []*treeNode
 	parent   *treeNode
+	expanded bool
 }
 
 func createNodes(path string, parent *treeNode) ([]*treeNode, error) {
 	var res []*treeNode
 
-	fmt.Println(path)
-
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		fmt.Println("---", path)
 		if err == nil && path != "." {
-			res = append(res, &treeNode{info, nil, parent})
+			res = append(res, &treeNode{info, nil, parent, false})
 			if info.IsDir() {
 				return filepath.SkipDir
 			}
@@ -65,6 +65,15 @@ func getPathFromNode(node *treeNode) string {
 	return path
 }
 
+func drawNodes(nodes []*treeNode) {
+	for _, node := range nodes {
+		if node.info.IsDir() {
+			fmt.Print("+")
+		}
+		fmt.Println(node.info.Name())
+	}
+}
+
 func test() {
 	nodes, err := createNodes(".", nil)
 	neo.PanicOnError(err)
@@ -73,7 +82,9 @@ func test() {
 		populateChildren(node)
 	}
 
-	spew.Dump(nodes)
+	drawNodes(nodes)
+
+	spew.Dump(err)
 	fmt.Println(err)
 }
 
