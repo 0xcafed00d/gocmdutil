@@ -68,7 +68,7 @@ func getPathFromNode(node *treeNode) string {
 func drawNodes(nodes []*treeNode) {
 	for _, node := range nodes {
 		if node.info.IsDir() {
-			fmt.Print("+")
+			fmt.Print("└──")
 		}
 		fmt.Println(node.info.Name())
 	}
