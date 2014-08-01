@@ -30,13 +30,14 @@ type treeNode struct {
 	expanded bool
 }
 
-func createNodes(path string, parent *treeNode) ([]*treeNode, error) {
-	var res []*treeNode
+func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
+	fmt.Println("createNodes", rootPath)
 
-	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-		fmt.Println("---", path)
-		if err == nil && path != "." {
-			res = append(res, &treeNode{info, nil, parent, false})
+	var res []*treeNode
+	err := filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
+        fmt.Println("walk func", path)
+		if err == nil && path != rootPath {
+			res = append(res, &treeNode{info, nil, parent, true})
 			if info.IsDir() {
 				return filepath.SkipDir
 			}
@@ -48,6 +49,8 @@ func createNodes(path string, parent *treeNode) ([]*treeNode, error) {
 }
 
 func populateChildren(node *treeNode) error {
+
+	fmt.Println("populateChildren")
 
 	if node.info.IsDir() {
 		children, err := createNodes(getPathFromNode(node), node)
@@ -61,7 +64,9 @@ func getPathFromNode(node *treeNode) string {
 	path := node.info.Name()
 	for node.parent != nil {
 		path = filepath.Join(node.info.Name(), path)
+		node = node.parent
 	}
+	fmt.Println("getPathFromNode", path)
 	return path
 }
 
@@ -84,20 +89,35 @@ func drawNodes(nodes []*treeNode) {
 		}
 
 		fmt.Println(node.info.Name())
+		if len(node.children) > 0 {
+			drawNodes(node.children)
+		}
+	}
+}
+
+func filltree(nodes []*treeNode) {
+
+	for _, node := range nodes {
+		populateChildren(node)
+		if len(node.children) > 0 {
+			filltree(node.children)
+		}
 	}
 }
 
 func test() {
-	nodes, err := createNodes(".", nil)
+	nodes, err := createNodes("/home/lmw", nil)
 	neo.PanicOnError(err)
 
-	for _, node := range nodes {
-		populateChildren(node)
-	}
+    children, err := createNodes(getPathFromNode(nodes[0]), nodes[0])
+	neo.PanicOnError(err)
+
+//	filltree(nodes)
 
 	drawNodes(nodes)
+	drawNodes(children)
 
-	spew.Dump(err)
+	spew.Dump(nodes)
 	fmt.Println(err)
 }
 
