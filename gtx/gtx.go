@@ -24,6 +24,7 @@ func printAtDef(x, y int, s string) {
 }
 
 type treeNode struct {
+	path     string
 	info     os.FileInfo
 	children []*treeNode
 	parent   *treeNode
@@ -31,13 +32,13 @@ type treeNode struct {
 }
 
 func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
-	fmt.Println("createNodes", rootPath)
+	//fmt.Println("createNodes", rootPath)
 
 	var res []*treeNode
 	err := filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
-        fmt.Println("walk func", path)
+		//fmt.Println("walk func", path)
 		if err == nil && path != rootPath {
-			res = append(res, &treeNode{info, nil, parent, true})
+			res = append(res, &treeNode{path, info, nil, parent, true})
 			if info.IsDir() {
 				return filepath.SkipDir
 			}
@@ -50,28 +51,22 @@ func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
 
 func populateChildren(node *treeNode) error {
 
-	fmt.Println("populateChildren")
+	//fmt.Println("populateChildren")
 
 	if node.info.IsDir() {
-		children, err := createNodes(getPathFromNode(node), node)
+		children, err := createNodes(node.path, node)
 		neo.PanicOnError(err)
 		node.children = children
 	}
 	return nil
 }
 
-func getPathFromNode(node *treeNode) string {
-	path := node.info.Name()
-	for node.parent != nil {
-		path = filepath.Join(node.info.Name(), path)
-		node = node.parent
-	}
-	fmt.Println("getPathFromNode", path)
-	return path
-}
+func drawNodes(nodes []*treeNode, indent int) {
 
-func drawNodes(nodes []*treeNode) {
 	for i, node := range nodes {
+		for n := 0; n < indent; n++ {
+			fmt.Print("   ")
+		}
 		if i == len(nodes)-1 {
 			fmt.Print("└─")
 		} else {
@@ -90,9 +85,10 @@ func drawNodes(nodes []*treeNode) {
 
 		fmt.Println(node.info.Name())
 		if len(node.children) > 0 {
-			drawNodes(node.children)
+			drawNodes(node.children, indent+1)
 		}
 	}
+
 }
 
 func filltree(nodes []*treeNode) {
@@ -106,18 +102,19 @@ func filltree(nodes []*treeNode) {
 }
 
 func test() {
-	nodes, err := createNodes("/home/lmw", nil)
+	rootpath := "."
+	if len(os.Args) > 1 {
+		rootpath = os.Args[1]
+	}
+
+	nodes, err := createNodes(rootpath, nil)
 	neo.PanicOnError(err)
 
-    children, err := createNodes(getPathFromNode(nodes[0]), nodes[0])
-	neo.PanicOnError(err)
+	filltree(nodes)
 
-//	filltree(nodes)
+	drawNodes(nodes, 0)
 
-	drawNodes(nodes)
-	drawNodes(children)
-
-	spew.Dump(nodes)
+	spew.Dump(err)
 	fmt.Println(err)
 }
 
