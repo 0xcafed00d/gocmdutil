@@ -41,7 +41,7 @@ func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
 			if len(res) > 0 {
 				res[len(res)-1].last = false
 			}
-			res = append(res, &treeNode{path, info, nil, parent, true, true})
+			res = append(res, &treeNode{path, info, nil, parent, false, true})
 			if info.IsDir() {
 				return filepath.SkipDir
 			}
@@ -58,6 +58,7 @@ func populateChildren(node *treeNode) error {
 		children, err := createNodes(node.path, node)
 		neo.PanicOnError(err)
 		node.children = children
+		node.expanded = true
 	}
 	return nil
 }
