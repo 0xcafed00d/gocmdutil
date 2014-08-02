@@ -29,16 +29,28 @@ type treeNode struct {
 	children []*treeNode
 	parent   *treeNode
 	expanded bool
+	last     bool
+}
+
+func findNodeDepth(node *treeNode) int {
+
+	depth := 0
+	for node.parent != nil {
+		depth++
+		node = node.parent
+	}
+	return depth
 }
 
 func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
-	//fmt.Println("createNodes", rootPath)
 
 	var res []*treeNode
 	err := filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
-		//fmt.Println("walk func", path)
 		if err == nil && path != rootPath {
-			res = append(res, &treeNode{path, info, nil, parent, true})
+			if len(res) > 0 {
+				res[len(res)-1].last = false
+			}
+			res = append(res, &treeNode{path, info, nil, parent, true, true})
 			if info.IsDir() {
 				return filepath.SkipDir
 			}
@@ -51,8 +63,6 @@ func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
 
 func populateChildren(node *treeNode) error {
 
-	//fmt.Println("populateChildren")
-
 	if node.info.IsDir() {
 		children, err := createNodes(node.path, node)
 		neo.PanicOnError(err)
@@ -61,12 +71,19 @@ func populateChildren(node *treeNode) error {
 	return nil
 }
 
-func drawNodes(nodes []*treeNode, indent int) {
+func drawNodes(nodes []*treeNode) {
 
 	for i, node := range nodes {
-		for n := 0; n < indent; n++ {
-			fmt.Print("   ")
+		preamble := ""
+		for n := node; n.parent != nil; n = n.parent {
+			if n.parent.last {
+				preamble = "   " + preamble
+			} else {
+				preamble = "│  " + preamble
+			}
 		}
+		fmt.Print(preamble)
+
 		if i == len(nodes)-1 {
 			fmt.Print("└─")
 		} else {
@@ -85,7 +102,7 @@ func drawNodes(nodes []*treeNode, indent int) {
 
 		fmt.Println(node.info.Name())
 		if len(node.children) > 0 {
-			drawNodes(node.children, indent+1)
+			drawNodes(node.children)
 		}
 	}
 
@@ -112,7 +129,7 @@ func test() {
 
 	filltree(nodes)
 
-	drawNodes(nodes, 0)
+	drawNodes(nodes)
 
 	spew.Dump(err)
 	fmt.Println(err)
