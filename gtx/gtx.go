@@ -36,6 +36,7 @@ func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
 
 	var res []*treeNode
 	err := filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
+
 		if err == nil && path != rootPath {
 			if len(res) > 0 {
 				res[len(res)-1].last = false
@@ -61,37 +62,42 @@ func populateChildren(node *treeNode) error {
 	return nil
 }
 
+func drawNode(node *treeNode) {
+
+	preamble := ""
+	for n := node; n.parent != nil; n = n.parent {
+		if n.parent.last {
+			preamble = "   " + preamble
+		} else {
+			preamble = "│  " + preamble
+		}
+	}
+	fmt.Print(preamble)
+
+	if node.last {
+		fmt.Print("└─")
+	} else {
+		fmt.Print("├─")
+	}
+
+	if node.info.IsDir() {
+		if node.expanded {
+			fmt.Print("[-]")
+		} else {
+			fmt.Print("[+]")
+		}
+	} else {
+		fmt.Print("── ")
+	}
+
+	fmt.Println(node.info.Name())
+}
+
 func drawNodes(nodes []*treeNode) {
 
-	for i, node := range nodes {
-		preamble := ""
-		for n := node; n.parent != nil; n = n.parent {
-			if n.parent.last {
-				preamble = "   " + preamble
-			} else {
-				preamble = "│  " + preamble
-			}
-		}
-		fmt.Print(preamble)
-
-		if i == len(nodes)-1 {
-			fmt.Print("└─")
-		} else {
-			fmt.Print("├─")
-		}
-
-		if node.info.IsDir() {
-			if node.expanded {
-				fmt.Print("[-]")
-			} else {
-				fmt.Print("[+]")
-			}
-		} else {
-			fmt.Print("── ")
-		}
-
-		fmt.Println(node.info.Name())
-		if len(node.children) > 0 {
+	for _, node := range nodes {
+		drawNode(node)
+		if node.expanded && len(node.children) > 0 {
 			drawNodes(node.children)
 		}
 	}
@@ -117,6 +123,8 @@ func test() {
 	neo.PanicOnError(err)
 
 	filltree(nodes)
+
+	nodes[0].expanded = false
 
 	drawNodes(nodes)
 
