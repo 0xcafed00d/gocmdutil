@@ -32,16 +32,6 @@ type treeNode struct {
 	last     bool
 }
 
-func findNodeDepth(node *treeNode) int {
-
-	depth := 0
-	for node.parent != nil {
-		depth++
-		node = node.parent
-	}
-	return depth
-}
-
 func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
 
 	var res []*treeNode
@@ -105,7 +95,6 @@ func drawNodes(nodes []*treeNode) {
 			drawNodes(node.children)
 		}
 	}
-
 }
 
 func filltree(nodes []*treeNode) {
@@ -170,7 +159,5 @@ func termtest() {
 }
 
 func main() {
-
 	test()
-
 }
