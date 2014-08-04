@@ -30,6 +30,7 @@ type treeNode struct {
 	parent   *treeNode
 	expanded bool
 	last     bool
+	index    int
 }
 
 func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
@@ -41,7 +42,7 @@ func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
 			if len(res) > 0 {
 				res[len(res)-1].last = false
 			}
-			res = append(res, &treeNode{path, info, nil, parent, false, true})
+			res = append(res, &treeNode{path, info, nil, parent, false, true, len(res)})
 			if info.IsDir() {
 				return filepath.SkipDir
 			}
@@ -101,6 +102,13 @@ func drawNodes(nodes []*treeNode) {
 		if node.expanded && len(node.children) > 0 {
 			drawNodes(node.children)
 		}
+	}
+}
+
+func drawNodesFrom(node *treeNode, count int) {
+	siblings := node.parent.children
+	for i, max := node.index, len(siblings); i < max; i++ {
+		drawNode(siblings[i])
 	}
 }
 
