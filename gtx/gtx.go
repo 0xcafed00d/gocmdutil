@@ -128,14 +128,22 @@ func test() {
 		rootpath = os.Args[1]
 	}
 
-	nodes, err := createNodes(rootpath, nil)
+	rootInfo, err := os.Stat(rootpath)
 	neo.PanicOnError(err)
 
+	rootNode := &treeNode{rootpath, rootInfo, nil, nil, true, true, 1}
+
+	nodes, err := createNodes(rootpath, rootNode)
+	neo.PanicOnError(err)
 	filltree(nodes)
+	rootNode.children = nodes
 
-	nodes[0].expanded = false
+	var root []*treeNode
+	root = append(root, rootNode)
 
-	drawNodes(nodes)
+	//	nodes[0].expanded = false
+
+	drawNodes(root)
 
 	spew.Dump(err)
 	fmt.Println(err)
