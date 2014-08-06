@@ -105,6 +105,14 @@ func drawNodes(nodes []*treeNode) {
 	}
 }
 
+func nextNode(node *treeNode) *treeNode {
+	return nil
+}
+
+func prevNode(node *treeNode) *treeNode {
+	return nil
+}
+
 func drawNodesFrom(node *treeNode, count int) {
 	siblings := node.parent.children
 	for i, max := node.index, len(siblings); i < max; i++ {
