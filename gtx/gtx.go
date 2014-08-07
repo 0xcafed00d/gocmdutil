@@ -29,8 +29,16 @@ type treeNode struct {
 	children []*treeNode
 	parent   *treeNode
 	expanded bool
-	last     bool
 	index    int
+}
+
+func (n *treeNode) isLast() bool {
+	if n.parent == nil {
+		return true
+	} else {
+		sibcount := len(n.parent.children)
+		return m.index == sibcount-1
+	}
 }
 
 func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
@@ -39,10 +47,7 @@ func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
 	err := filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
 
 		if err == nil && path != rootPath {
-			if len(res) > 0 {
-				res[len(res)-1].last = false
-			}
-			res = append(res, &treeNode{path, info, nil, parent, false, true, len(res)})
+			res = append(res, &treeNode{path, info, nil, parent, false, len(res)})
 			if info.IsDir() {
 				return filepath.SkipDir
 			}
@@ -139,7 +144,7 @@ func test() {
 	rootInfo, err := os.Stat(rootpath)
 	neo.PanicOnError(err)
 
-	rootNode := &treeNode{rootpath, rootInfo, nil, nil, true, true, 1}
+	rootNode := &treeNode{rootpath, rootInfo, nil, nil, true, 0}
 
 	nodes, err := createNodes(rootpath, rootNode)
 	neo.PanicOnError(err)
