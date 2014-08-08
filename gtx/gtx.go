@@ -36,8 +36,7 @@ func (n *treeNode) isLast() bool {
 	if n.parent == nil {
 		return true
 	} else {
-		sibcount := len(n.parent.children)
-		return m.index == sibcount-1
+		return n.index == len(n.parent.children)-1
 	}
 }
 
@@ -73,7 +72,7 @@ func drawNode(node *treeNode) {
 
 	preamble := ""
 	for n := node; n.parent != nil; n = n.parent {
-		if n.parent.last {
+		if n.isLast() {
 			preamble = "   " + preamble
 		} else {
 			preamble = "│  " + preamble
@@ -81,7 +80,7 @@ func drawNode(node *treeNode) {
 	}
 	fmt.Print(preamble)
 
-	if node.last {
+	if node.isLast() {
 		fmt.Print("└─")
 	} else {
 		fmt.Print("├─")
