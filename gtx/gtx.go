@@ -40,6 +40,22 @@ func (n *treeNode) isLast() bool {
 	}
 }
 
+func (n *treeNode) nextSibling() (*treeNode, bool) {
+	if n.isLast() {
+		return nil, false
+	} else {
+		return n.parent.children[n.index+1], true
+	}
+}
+
+func (n *treeNode) prevSibling() (*treeNode, bool) {
+	if n.index == 0 {
+		return nil, false
+	} else {
+		return n.parent.children[n.index-1], true
+	}
+}
+
 func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
 
 	var res []*treeNode
@@ -72,7 +88,7 @@ func drawNode(node *treeNode) {
 
 	preamble := ""
 	for n := node; n.parent != nil; n = n.parent {
-		if n.isLast() {
+		if n.parent.isLast() {
 			preamble = "   " + preamble
 		} else {
 			preamble = "│  " + preamble
@@ -96,7 +112,7 @@ func drawNode(node *treeNode) {
 		fmt.Print("── ")
 	}
 
-	fmt.Println(node.info.Name())
+	fmt.Println(node.info.Name(), node.isLast())
 }
 
 func drawNodes(nodes []*treeNode) {
@@ -109,8 +125,22 @@ func drawNodes(nodes []*treeNode) {
 	}
 }
 
-func nextNode(node *treeNode) *treeNode {
-	return nil
+func nextNode(node *treeNode) (*treeNode, bool) {
+
+	if node.children != nil && len(node.children) > 0 {
+		return node.children[0], true
+	}
+
+	if node.isLast() {
+		for node.parent != nil {
+			node = node.parent
+			if ps, ok := node.nextSibling(); ok {
+				return ps, ok
+			}
+		}
+		return nil, false
+	}
+	return node.nextSibling()
 }
 
 func prevNode(node *treeNode) *treeNode {
@@ -155,7 +185,11 @@ func test() {
 
 	//	nodes[0].expanded = false
 
-	drawNodes(root)
+	//drawNodes(root)
+
+	for n, ok := rootNode, true; ok; n, ok = nextNode(n) {
+		drawNode(n)
+	}
 
 	spew.Dump(err)
 	fmt.Println(err)
