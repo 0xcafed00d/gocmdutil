@@ -143,6 +143,17 @@ func nextNode(node *treeNode) (*treeNode, bool) {
 	return node.nextSibling()
 }
 
+func advanceNodes(node *treeNode, advanceCount int) (*treeNode, bool) {
+	for n := 0; n < advanceCount; n++ {
+		next, ok := nextNode(node)
+		if !ok {
+			return node, false
+		}
+		node = next
+	}
+	return node, true
+}
+
 func prevNode(node *treeNode) *treeNode {
 	return nil
 }
@@ -187,7 +198,9 @@ func test() {
 
 	//drawNodes(root)
 
-	for n, ok := rootNode, true; ok; n, ok = nextNode(n) {
+    start, _ := advanceNodes (rootNode, 20)
+
+	for n, ok := start, true; ok; n, ok = nextNode(n) {
 		drawNode(n)
 	}
 
