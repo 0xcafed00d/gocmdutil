@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
-	"github.com/simulatedsimian/neo"
 	"os"
 	"path/filepath"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/simulatedsimian/neo"
 )
-
 
 type treeNode struct {
 	path     string
@@ -94,7 +93,7 @@ func nodeToStrings(node *treeNode) (string, string) {
 			preamble += "[+]"
 		}
 	} else {
-		preamble += "── "
+			preamble += "── "
 	}
 
 	return preamble, node.info.Name()
@@ -107,7 +106,7 @@ func drawNodes(nodes []*treeNode) {
 		if node.expanded && len(node.children) > 0 {
 			drawNodes(node.children)
 		}
-    }
+	}
 }
 
 func nextNode(node *treeNode) (*treeNode, bool) {
@@ -183,7 +182,7 @@ func test() {
 
 	//drawNodes(root)
 
-    start, _ := advanceNodes (rootNode, 20)
+	start, _ := advanceNodes(rootNode, 20)
 
 	for n, ok := start, true; ok; n, ok = nextNode(n) {
 		fmt.Println(nodeToStrings(n))
@@ -193,7 +192,6 @@ func test() {
 	fmt.Println(err)
 }
 
-
-func main() {
+func mainx() {
 	test()
 }
