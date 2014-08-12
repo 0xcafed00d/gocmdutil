@@ -3,14 +3,14 @@ package main
 import (
 	"fmt"
 	"github.com/nsf/termbox-go"
-	"unicode/utf8"
-	"os"
+	"github.com/simulatedsimian/go_sandbox/geom"
 	"github.com/simulatedsimian/neo"
-
+	"os"
+	"unicode/utf8"
 )
 
 func main() {
-	
+
 	rootpath := "."
 	if len(os.Args) > 1 {
 		rootpath = os.Args[1]
@@ -32,10 +32,10 @@ func main() {
 	termtest(rootNode)
 }
 
-func drawFromNode (node *treeNode, count int) {
+func drawFromNode(node *treeNode, count int) {
 	for i := 0; i < count; i++ {
 		p, n := nodeToStrings(node)
-		printAtDef (0, i, p + n + "             ")
+		printAtDef(0, i, p+n+"             ")
 		var ok bool
 		node, ok = nextNode(node)
 		if !ok {
@@ -69,10 +69,10 @@ func termtest(root *treeNode) {
 	currentNode := root
 
 	for {
-	
-		drawFromNode (currentNode, 10)	
-		termbox.Flush()		
-	
+
+		drawFromNode(currentNode, 10)
+		termbox.Flush()
+
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
 			printAt(0, 20, fmt.Sprint(ev), termbox.ColorDefault, termbox.ColorDefault)
@@ -83,10 +83,10 @@ func termtest(root *treeNode) {
 				return
 			case termbox.KeyArrowUp:
 			case termbox.KeyArrowDown:
-				n, ok := nextNode (currentNode)
+				n, ok := nextNode(currentNode)
 				if ok {
 					currentNode = n
-				}			
+				}
 			}
 
 			termbox.Flush()

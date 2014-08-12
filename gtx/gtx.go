@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/simulatedsimian/neo"
+	"os"
+	"path/filepath"
 )
 
 type treeNode struct {
@@ -93,7 +93,7 @@ func nodeToStrings(node *treeNode) (string, string) {
 			preamble += "[+]"
 		}
 	} else {
-			preamble += "── "
+		preamble += "── "
 	}
 
 	return preamble, node.info.Name()
@@ -139,6 +139,15 @@ func advanceNodes(node *treeNode, advanceCount int) (*treeNode, bool) {
 }
 
 func prevNode(node *treeNode) *treeNode {
+
+	if node.index == 0 {
+		if node.parent != nil {
+			return node.parent, true
+		} else {
+			return nil, false
+		}
+	}
+
 	return nil
 }
 
