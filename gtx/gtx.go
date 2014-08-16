@@ -138,7 +138,7 @@ func advanceNodes(node *treeNode, advanceCount int) (*treeNode, bool) {
 	return node, true
 }
 
-func prevNode(node *treeNode) *treeNode {
+func prevNode(node *treeNode) (*treeNode, bool) {
 
 	if node.index == 0 {
 		if node.parent != nil {
