@@ -69,6 +69,7 @@ func termtest(root *treeNode) {
 	currentNode := root
 
 	for {
+		clearRect(geom.RectangleFromSize(geom.Coord{50, 20}))
 
 		drawFromNode(currentNode, 10)
 		termbox.Flush()

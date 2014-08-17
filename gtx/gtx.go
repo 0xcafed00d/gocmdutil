@@ -148,7 +148,7 @@ func prevNode(node *treeNode) (*treeNode, bool) {
 		}
 	}
 
-	return nil
+	return nil, false
 }
 
 func drawNodesFrom(node *treeNode, count int) {
