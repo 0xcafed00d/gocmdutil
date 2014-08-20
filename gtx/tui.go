@@ -6,7 +6,6 @@ import (
 	"github.com/simulatedsimian/go_sandbox/geom"
 	"github.com/simulatedsimian/neo"
 	"os"
-	"unicode/utf8"
 )
 
 func main() {
@@ -44,19 +43,6 @@ func drawFromNode(node *treeNode, count int) {
 	}
 }
 
-func printAt(x, y int, s string, fg, bg termbox.Attribute) {
-	for len(s) > 0 {
-		r, rlen := utf8.DecodeRuneInString(s)
-		termbox.SetCell(x, y, r, fg, bg)
-		s = s[rlen:]
-		x++
-	}
-}
-
-func printAtDef(x, y int, s string) {
-	printAt(x, y, s, termbox.ColorDefault, termbox.ColorDefault)
-}
-
 func termtest(root *treeNode) {
 	err := termbox.Init()
 	if err != nil {
@@ -69,7 +55,7 @@ func termtest(root *treeNode) {
 	currentNode := root
 
 	for {
-		clearRect(geom.RectangleFromSize(geom.Coord{50, 20}))
+		clearRectDef(geom.RectangleFromSize(geom.Coord{50, 20}))
 
 		drawFromNode(currentNode, 10)
 		termbox.Flush()
