@@ -52,12 +52,13 @@ func termtest(root *treeNode) {
 
 	termbox.HideCursor()
 
+	termx, termy := termbox.Size()
+
 	currentNode := root
 
 	for {
-		clearRectDef(geom.RectangleFromSize(geom.Coord{50, 20}))
-
-		drawFromNode(currentNode, 10)
+		clearRectDef(geom.RectangleFromSize(geom.Coord{termx, termy}))
+		drawFromNode(currentNode, termy)
 		termbox.Flush()
 
 		switch ev := termbox.PollEvent(); ev.Type {
@@ -79,8 +80,8 @@ func termtest(root *treeNode) {
 			termbox.Flush()
 
 		case termbox.EventResize:
-			x, y := ev.Width, ev.Height
-			printAt(0, 21, fmt.Sprintf("[%d, %d] ", x, y), termbox.ColorDefault, termbox.ColorDefault)
+			termx, termy = ev.Width, ev.Height
+			printAt(0, 21, fmt.Sprintf("[%d, %d] ", termx, termy), termbox.ColorDefault, termbox.ColorDefault)
 			termbox.Flush()
 		}
 	}
