@@ -70,10 +70,13 @@ func termtest(root *treeNode) {
 			case termbox.KeyEsc:
 				return
 			case termbox.KeyArrowUp:
+				if node, ok := prevNode(currentNode); ok {
+					currentNode = node
+				}
+
 			case termbox.KeyArrowDown:
-				n, ok := nextNode(currentNode)
-				if ok {
-					currentNode = n
+				if node, ok := nextNode(currentNode); ok {
+					currentNode = node
 				}
 			}
 

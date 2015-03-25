@@ -109,12 +109,24 @@ func drawNodes(nodes []*treeNode) {
 	}
 }
 
+func deepestNode(node *treeNode) *treeNode {
+	if node.children != nil {
+		return deepestNode(node.children[len(node.children)-1])
+	}
+
+	return node
+}
+
 func nextNode(node *treeNode) (*treeNode, bool) {
 
+	// this node has children? then next node is first child.
+	// TODO check to see if node is expanded.
 	if node.children != nil && len(node.children) > 0 {
 		return node.children[0], true
 	}
 
+	// if we are last sibling - taverse up tree till we find a
+	// parent with a sibling.
 	if node.isLast() {
 		for node.parent != nil {
 			node = node.parent
@@ -122,8 +134,10 @@ func nextNode(node *treeNode) (*treeNode, bool) {
 				return ps, ok
 			}
 		}
+		// no parents with siblings
 		return nil, false
 	}
+
 	return node.nextSibling()
 }
 
@@ -143,12 +157,14 @@ func prevNode(node *treeNode) (*treeNode, bool) {
 	if node.index == 0 {
 		if node.parent != nil {
 			return node.parent, true
-		} else {
-			return nil, false
 		}
+
+		return nil, false
 	}
 
-	return nil, false
+	prevSib, _ := node.prevSibling()
+
+	return deepestNode(prevSib), true
 }
 
 func drawNodesFrom(node *treeNode, count int) {
