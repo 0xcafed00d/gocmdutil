@@ -25,19 +25,19 @@ func (n *treeNode) isLast() bool {
 	}
 }
 
-func (n *treeNode) nextSibling() (*treeNode, bool) {
+func (n *treeNode) nextSibling() *treeNode {
 	if n.isLast() {
-		return nil, false
+		return nil
 	} else {
-		return n.parent.children[n.index+1], true
+		return n.parent.children[n.index+1]
 	}
 }
 
-func (n *treeNode) prevSibling() (*treeNode, bool) {
+func (n *treeNode) prevSibling() *treeNode {
 	if n.index == 0 {
-		return nil, false
+		return nil
 	} else {
-		return n.parent.children[n.index-1], true
+		return n.parent.children[n.index-1]
 	}
 }
 
@@ -117,12 +117,12 @@ func deepestNode(node *treeNode) *treeNode {
 	return node
 }
 
-func nextNode(node *treeNode) (*treeNode, bool) {
+func nextNode(node *treeNode) *treeNode {
 
 	// this node has children? then next node is first child.
 	// TODO check to see if node is expanded.
 	if node.children != nil && len(node.children) > 0 {
-		return node.children[0], true
+		return node.children[0]
 	}
 
 	// if we are last sibling - taverse up tree till we find a
@@ -130,12 +130,12 @@ func nextNode(node *treeNode) (*treeNode, bool) {
 	if node.isLast() {
 		for node.parent != nil {
 			node = node.parent
-			if ps, ok := node.nextSibling(); ok {
-				return ps, ok
+			if ps := node.nextSibling(); ps != nil {
+				return ps
 			}
 		}
 		// no parents with siblings
-		return nil, false
+		return nil
 	}
 
 	return node.nextSibling()
@@ -143,8 +143,8 @@ func nextNode(node *treeNode) (*treeNode, bool) {
 
 func advanceNodes(node *treeNode, advanceCount int) (*treeNode, bool) {
 	for n := 0; n < advanceCount; n++ {
-		next, ok := nextNode(node)
-		if !ok {
+		next := nextNode(node)
+		if next == nil {
 			return node, false
 		}
 		node = next
@@ -152,19 +152,19 @@ func advanceNodes(node *treeNode, advanceCount int) (*treeNode, bool) {
 	return node, true
 }
 
-func prevNode(node *treeNode) (*treeNode, bool) {
+func prevNode(node *treeNode) *treeNode {
 
 	if node.index == 0 {
 		if node.parent != nil {
-			return node.parent, true
+			return node.parent
 		}
 
-		return nil, false
+		return nil
 	}
 
-	prevSib, _ := node.prevSibling()
+	prevSib := node.prevSibling()
 
-	return deepestNode(prevSib), true
+	return deepestNode(prevSib)
 }
 
 func drawNodesFrom(node *treeNode, count int) {
@@ -209,7 +209,7 @@ func test() {
 
 	start, _ := advanceNodes(rootNode, 20)
 
-	for n, ok := start, true; ok; n, ok = nextNode(n) {
+	for n := start; n != nil; n = nextNode(n) {
 		fmt.Println(nodeToStrings(n))
 	}
 

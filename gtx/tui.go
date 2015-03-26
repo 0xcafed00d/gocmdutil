@@ -35,9 +35,9 @@ func drawFromNode(node *treeNode, count int) {
 	for i := 0; i < count; i++ {
 		p, n := nodeToStrings(node)
 		printAtDef(0, i, p+n+"             ")
-		var ok bool
-		node, ok = nextNode(node)
-		if !ok {
+
+		node = nextNode(node)
+		if node == nil {
 			break
 		}
 	}
@@ -70,12 +70,12 @@ func termtest(root *treeNode) {
 			case termbox.KeyEsc:
 				return
 			case termbox.KeyArrowUp:
-				if node, ok := prevNode(currentNode); ok {
+				if node := prevNode(currentNode); node != nil {
 					currentNode = node
 				}
 
 			case termbox.KeyArrowDown:
-				if node, ok := nextNode(currentNode); ok {
+				if node := nextNode(currentNode); node != nil {
 					currentNode = node
 				}
 			}
