@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/nsf/termbox-go"
 	"github.com/simulatedsimian/go_sandbox/geom"
 	"github.com/simulatedsimian/neo"
@@ -18,7 +17,7 @@ func main() {
 	rootInfo, err := os.Stat(rootpath)
 	neo.PanicOnError(err)
 
-	rootNode := &treeNode{rootpath, rootInfo, nil, nil, true, 0}
+	rootNode := &treeNode{nil, nil, true, 0, nodeData{rootpath, rootInfo}}
 
 	nodes, err := createNodes(rootpath, rootNode)
 	neo.PanicOnError(err)
@@ -36,7 +35,7 @@ func drawFromNode(node *treeNode, count int) {
 		p, n := nodeToStrings(node)
 		printAtDef(0, i, p+n+"             ")
 
-		node = nextNode(node)
+		node = node.nextNode()
 		if node == nil {
 			break
 		}
@@ -63,28 +62,32 @@ func termtest(root *treeNode) {
 
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
-			printAt(0, 20, fmt.Sprint(ev), termbox.ColorDefault, termbox.ColorDefault)
-			termbox.Flush()
-
 			switch ev.Key {
 			case termbox.KeyEsc:
 				return
 			case termbox.KeyArrowUp:
-				if node := prevNode(currentNode); node != nil {
+				if node := currentNode.prevNode(); node != nil {
 					currentNode = node
 				}
 
 			case termbox.KeyArrowDown:
-				if node := nextNode(currentNode); node != nil {
+				if node := currentNode.nextNode(); node != nil {
 					currentNode = node
 				}
+
+			case termbox.KeyPgdn:
+				node, _ := currentNode.advanceNodes(10)
+				currentNode = node
+
+			case termbox.KeyPgup:
+				node, _ := currentNode.retreatNodes(10)
+				currentNode = node
 			}
 
 			termbox.Flush()
 
 		case termbox.EventResize:
 			termx, termy = ev.Width, ev.Height
-			printAt(0, 21, fmt.Sprintf("[%d, %d] ", termx, termy), termbox.ColorDefault, termbox.ColorDefault)
 			termbox.Flush()
 		}
 	}
