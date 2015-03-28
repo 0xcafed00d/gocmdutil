@@ -76,11 +76,11 @@ func termtest(root *treeNode) {
 				}
 
 			case termbox.KeyPgdn:
-				node, _ := currentNode.advanceNodes(10)
+				node, _ := currentNode.traverseNodes(10)
 				currentNode = node
 
 			case termbox.KeyPgup:
-				node, _ := currentNode.retreatNodes(10)
+				node, _ := currentNode.traverseNodes(-10)
 				currentNode = node
 			}
 

@@ -79,24 +79,25 @@ func (node *treeNode) prevNode() *treeNode {
 	return prevSib.deepestNode()
 }
 
-func (node *treeNode) advanceNodes(advanceCount int) (*treeNode, int) {
-	for n := 0; n < advanceCount; n++ {
-		next := node.nextNode()
-		if next == nil {
-			return node, n
-		}
-		node = next
+func iabs(a int) int {
+	if a < 0 {
+		return -a
 	}
-	return node, advanceCount
+	return a
 }
 
-func (node *treeNode) retreatNodes(advanceCount int) (*treeNode, int) {
-	for n := 0; n < advanceCount; n++ {
-		next := node.prevNode()
+func (node *treeNode) traverseNodes(count int) (*treeNode, int) {
+	for n := 0; n < iabs(count); n++ {
+		var next *treeNode
+		if count < 0 {
+			next = node.prevNode()
+		} else {
+			next = node.nextNode()
+		}
 		if next == nil {
 			return node, n
 		}
 		node = next
 	}
-	return node, advanceCount
+	return node, count
 }
