@@ -1,17 +1,21 @@
 package main
 
 import (
+	"github.com/mattn/go-runewidth"
 	"github.com/nsf/termbox-go"
 	"github.com/simulatedsimian/go_sandbox/geom"
-	"unicode/utf8"
+
+	//"unicode/utf8"
 )
 
 func printAt(x, y int, s string, fg, bg termbox.Attribute) {
-	for len(s) > 0 {
-		r, rlen := utf8.DecodeRuneInString(s)
+	for _, r := range s {
 		termbox.SetCell(x, y, r, fg, bg)
-		s = s[rlen:]
-		x++
+		w := runewidth.RuneWidth(r)
+		if w == 0 || (w == 2 && runewidth.IsAmbiguousWidth(r)) {
+			w = 1
+		}
+		x += w
 	}
 }
 
@@ -34,5 +38,5 @@ func clearRect(rect geom.Rectangle, c rune, fg, bg termbox.Attribute) {
 }
 
 func clearRectDef(rect geom.Rectangle) {
-	clearRect(rect, ' ', termbox.ColorDefault, termbox.ColorDefault)
+	clearRect(rect, '.', termbox.ColorDefault, termbox.ColorDefault)
 }
