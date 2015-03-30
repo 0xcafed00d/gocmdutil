@@ -65,7 +65,7 @@ func (node *treeNode) nextNode() *treeNode {
 }
 
 func (node *treeNode) prevNode() *treeNode {
-
+	// if first sibling then return parent
 	if node.index == 0 {
 		if node.parent != nil {
 			return node.parent
@@ -74,12 +74,11 @@ func (node *treeNode) prevNode() *treeNode {
 		return nil
 	}
 
-	prevSib := node.prevSibling()
-
-	return prevSib.deepestNode()
+	// return the deepest node of previous sibling
+	return node.prevSibling().deepestNode()
 }
 
-func iabs(a int) int {
+func Iabs(a int) int {
 	if a < 0 {
 		return -a
 	}
@@ -87,7 +86,7 @@ func iabs(a int) int {
 }
 
 func (node *treeNode) traverseNodes(count int) (*treeNode, int) {
-	for n := 0; n < iabs(count); n++ {
+	for n := 0; n < Iabs(count); n++ {
 		var next *treeNode
 		if count < 0 {
 			next = node.prevNode()
