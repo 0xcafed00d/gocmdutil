@@ -8,6 +8,10 @@ type treeNode struct {
 	data     interface{}
 }
 
+func newTreeNode(parent *treeNode, index int, data interface{}) *treeNode {
+	return &treeNode{nil, parent, false, index, data}
+}
+
 func (n *treeNode) isLast() bool {
 	if n.parent == nil {
 		return true

@@ -17,16 +17,8 @@ func main() {
 	rootInfo, err := os.Stat(rootpath)
 	neo.PanicOnError(err)
 
-	rootNode := &treeNode{nil, nil, true, 0, nodeData{rootpath, rootInfo}}
-
-	nodes, err := createNodes(rootpath, rootNode)
-	neo.PanicOnError(err)
-	filltree(nodes)
-	rootNode.children = nodes
-
-	var root []*treeNode
-	root = append(root, rootNode)
-
+	rootNode := newTreeNode(nil, 0, nodeData{rootpath, rootInfo})
+	populateChildren(rootNode)
 	termtest(rootNode)
 }
 

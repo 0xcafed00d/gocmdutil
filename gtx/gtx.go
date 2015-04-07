@@ -17,7 +17,7 @@ func createNodes(rootPath string, parent *treeNode) ([]*treeNode, error) {
 	err := filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
 
 		if err == nil && path != rootPath {
-			res = append(res, &treeNode{nil, parent, false, len(res), nodeData{path, info}})
+			res = append(res, newTreeNode(parent, len(res), nodeData{path, info}))
 			if info.IsDir() {
 				return filepath.SkipDir
 			}
