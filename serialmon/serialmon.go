@@ -61,4 +61,10 @@ func main() {
 
 	comms := openComms(config)
 	defer comms.Close()
+
+	go func() {
+		io.Copy(os.Stdout, comms)
+	}()
+
+	io.Copy(comms, os.Stdin)
 }
