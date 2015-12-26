@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/rwcarlsen/goexif/exif"
 )
@@ -16,8 +17,8 @@ func exitOnError(err error) {
 
 func main() {
 	if len(os.Args) > 1 {
-		for _, v := range os.Args[1:] {
-			f, err := os.Open(v)
+		for _, path := range os.Args[1:] {
+			f, err := os.Open(path)
 			exitOnError(err)
 			defer f.Close()
 
@@ -25,12 +26,26 @@ func main() {
 			exitOnError(err)
 
 			date, err := ex.DateTime()
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "Error processing:", path, err)
+				continue
+			}
 
-			newname := fmt.Sprintf("IMG_%04d_%02d_%02d_%02d_%02d_%02d.jpg",
+			dir, file := filepath.Split(path)
+			ext := filepath.Ext(file)
+
+			newname := fmt.Sprintf("%04d_%02d_%02d_%02d_%02d_%02d%s",
 				date.Year(), int(date.Month()), date.Day(),
-				date.Hour(), date.Minute(), date.Second())
+				date.Hour(), date.Minute(), date.Second(), ext)
 
-			fmt.Printf("%s -> %s\n", v, newname)
+			newpath := filepath.Join(dir, newname)
+
+			fmt.Printf("%s -> %s\n", path, newpath)
+			os.Rename(path, newpath)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "Error processing:", path, err)
+				continue
+			}
 		}
 	}
 }
