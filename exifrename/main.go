@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/rwcarlsen/goexif/exif"
 )
@@ -13,6 +14,17 @@ func exitOnError(err error) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+func fileExists(filename string) bool {
+	_, err := os.Stat(filename)
+	return !os.IsNotExist(err)
+}
+
+func makeNewname(date time.Time, ext string, count int) string {
+	return fmt.Sprintf("%04d_%02d_%02d_%02d_%02d_%02d_%02d%s",
+		date.Year(), int(date.Month()), date.Day(),
+		date.Hour(), date.Minute(), date.Second(), count, ext)
 }
 
 func main() {
@@ -34,18 +46,24 @@ func main() {
 			dir, file := filepath.Split(path)
 			ext := filepath.Ext(file)
 
-			newname := fmt.Sprintf("%04d_%02d_%02d_%02d_%02d_%02d%s",
-				date.Year(), int(date.Month()), date.Day(),
-				date.Hour(), date.Minute(), date.Second(), ext)
+			count := 0
+			for {
 
-			newpath := filepath.Join(dir, newname)
+				newname := makeNewname(date, ext, count)
+				newpath := filepath.Join(dir, newname)
 
-			fmt.Printf("%s -> %s\n", path, newpath)
-			os.Rename(path, newpath)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, "Error processing:", path, err)
-				continue
+				if fileExists(newpath) {
+					count++
+				} else {
+					fmt.Printf("%s -> %s\n", path, newpath)
+					os.Rename(path, newpath)
+					if err != nil {
+						fmt.Fprintln(os.Stderr, "Error processing:", path, err)
+					}
+					break
+				}
 			}
+
 		}
 	}
 }
