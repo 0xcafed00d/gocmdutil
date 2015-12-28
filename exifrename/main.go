@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/rwcarlsen/goexif/exif"
@@ -27,9 +28,28 @@ func makeNewname(date time.Time, ext string, count int) string {
 		date.Hour(), date.Minute(), date.Second(), count, ext)
 }
 
+func glob(args []string) []string {
+	var result []string
+
+	for _, path := range args {
+		files, err := filepath.Glob(path)
+		if err == nil {
+			result = append(result, files...)
+		}
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) > 1 {
-		for _, path := range os.Args[1:] {
+		files := os.Args[1:]
+
+		if runtime.GOOS == "windows" {
+			files = glob(files)
+		}
+
+		for _, path := range files {
 			f, err := os.Open(path)
 			exitOnError(err)
 			defer f.Close()
